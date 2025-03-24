@@ -5,10 +5,9 @@ const Update = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [age, setAge] = useState(0);
-
+  const [image, setImage] = useState(null);
   const [error, setError] = useState();
   const { id } = useParams();
-  // console.log(id);
 
   const navigate = useNavigate();
 
@@ -20,29 +19,36 @@ const Update = () => {
       setName(result.name);
       setEmail(result.email);
       setAge(result.age);
+      setImage(result.image);
+    }
+    if (!response.ok) {
+      setError(result.error);
     }
   };
 
-  const handleUpdate = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const updatedUser = { name, email, age };
-    console.log(updatedUser);
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("age", age);
+    if (image) formData.append("image", image);
+
     const response = await fetch(`http://localhost:5000/${id}`, {
       method: "PUT",
-      body: JSON.stringify(updatedUser),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: formData,
     });
+
     const result = await response.json();
-    if (response.ok) {
-      console.log("updated result..", result);
+    if (!response.ok) {
+      setError(result.error);
+    } else {
+      setName("");
+      setEmail("");
+      setAge(0);
+      setImage(null);
       setError("");
       navigate("/all");
-    }
-    if (!response.ok) {
-      console.log(response.error);
-      setError(response.error);
     }
   };
 
@@ -52,9 +58,9 @@ const Update = () => {
 
   return (
     <div className="container my-2">
-      <h1 className="h1 text-center">Edit Data</h1>
+      <h2 className="text-center">Edit User</h2>
       {error && <div className="alert alert-danger"> {error} </div>}
-      <form className="form" onSubmit={handleUpdate}>
+      <form className="form" onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label">Name</label>
           <input
@@ -82,7 +88,24 @@ const Update = () => {
             onChange={(e) => setAge(e.target.value)}
           />
         </div>
-        <button type="submit" className="btn btn-info">
+        <div className="mb-3">
+          <label className="form-label">Image</label>
+          <input
+            type="file"
+            className="form-control"
+            onChange={(e) => setImage(e.target.files[0])}
+          />
+          {image && (
+            <img
+              src={
+                typeof image === "string" ? image : URL.createObjectURL(image)
+              }
+              alt="Preview"
+              style={{ width: "100px", marginTop: "10px" }}
+            />
+          )}
+        </div>
+        <button type="submit" className="btn btn-primary">
           Update
         </button>
       </form>

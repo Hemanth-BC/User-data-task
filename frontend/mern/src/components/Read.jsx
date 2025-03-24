@@ -8,13 +8,11 @@ const Read = () => {
   async function getData() {
     const response = await fetch("http://localhost:5000");
     const result = await response.json();
-    console.log("result..", result);
     if (!response.ok) {
       setError(result.error);
     }
 
     if (response.ok) {
-      console.log(response.ok);
       setData(result);
       setError("");
     }
@@ -29,7 +27,6 @@ const Read = () => {
       setError(result1.error);
     }
     if (response.ok) {
-      console.log("deleted", response.ok);
       setError("Deleted Successfully");
       setTimeout(() => {
         setError("");
@@ -49,6 +46,11 @@ const Read = () => {
         {data?.map((ele) => (
           <div key={ele._id} className="col-3">
             <div className="card">
+              <img
+                src={ele.image ? ele.image : "https://via.placeholder.com/150"}
+                className="card-img-top"
+                alt="User Image"
+              />
               <div className="card-body">
                 <h5 className="card-title">{ele.name}</h5>
                 <h6 className="card-subtitle mb-2 text-muted">{ele.email}</h6>
@@ -72,5 +74,4 @@ const Read = () => {
     </div>
   );
 };
-
 export default Read;
